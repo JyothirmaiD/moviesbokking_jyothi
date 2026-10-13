@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CineVerse — Movie Ticket Booking & Reviews{% endblock %}</title>
+    <meta name="description" content="Discover movies, check showtimes, select seats in interactive 5x8 auditorium, and read community reviews.">
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- CineVerse Custom Cinema Theme -->
+    <link rel="stylesheet" href="{% static 'css/cinema.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-cinema sticky-top">
+        <div class="container">
+            <a class="brand-logo" href="{% url 'movies:movie_list' %}">
+                <i class="bi bi-film brand-icon"></i>
+                <span class="brand-text">Cine<span>Verse</span></span>
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'movie_list' %}active{% endif %}" href="{% url 'movies:movie_list' %}">
+                            <i class="bi bi-play-circle me-1"></i> Now Showing
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'my_bookings' %}active{% endif %}" href="{% url 'movies:my_bookings' %}">
+                            <i class="bi bi-ticket-perforated me-1"></i> My Bookings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/" target="_blank">
+                            <i class="bi bi-shield-lock me-1"></i> Admin Portal
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Header Search -->
+                <form class="d-flex me-lg-2" action="{% url 'movies:movie_list' %}" method="GET">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control bg-dark text-light border-secondary" type="search" name="q" placeholder="Search movies, genre..." value="{{ search_query|default:'' }}" aria-label="Search">
+                        <button class="btn btn-outline-danger" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Global Flash Notification Messages -->
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm" role="alert">
+                    <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% elif message.tags == 'danger' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Cinema Footer -->
+    <footer class="footer-cinema mt-5">
+        <div class="container text-center text-md-start">
+            <div class="row g-4 align-items-center">
+                <div class="col-md-6">
+                    <a class="brand-logo mb-2 d-inline-flex" href="{% url 'movies:movie_list' %}">
+                        <i class="bi bi-film brand-icon"></i>
+                        <span class="brand-text">Cine<span>Verse</span></span>
+                    </a>
+                    <p class="text-muted small mb-0">
+                        Capstone Project 5: Movie Ticket Booking & Community Review Portal.<br>
+                        Engineered with Django, SQLite ORM, WhiteNoise, Gunicorn, and Render.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex justify-content-md-end gap-3 mb-2">
+                        <a href="{% url 'movies:movie_list' %}" class="text-secondary text-decoration-none small">Now Showing</a>
+                        <span class="text-muted">•</span>
+                        <a href="{% url 'movies:my_bookings' %}" class="text-secondary text-decoration-none small">My Tickets</a>
+                        <span class="text-muted">•</span>
+                        <a href="/admin/" class="text-secondary text-decoration-none small">Django Admin</a>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        © {% now "Y" %} CineVerse Portal. Built for Full-Stack Capstone Student Assignment.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5.3 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- CineVerse Interactive JS -->
+    <script src="{% static 'js/seat_booking.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

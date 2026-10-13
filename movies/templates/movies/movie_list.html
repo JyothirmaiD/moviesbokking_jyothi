@@ -1,0 +1,145 @@
+{% extends 'movies/base.html' %}
+{% load static %}
+
+{% block title %}Now Showing Movies — CineVerse Portal{% endblock %}
+
+{% block content %}
+<!-- Cinema Hero Section -->
+<section class="hero-cinema text-center">
+    <div class="container">
+        <span class="badge bg-danger px-3 py-2 text-uppercase fw-bold rounded-pill mb-3">
+            <i class="bi bi-camera-reels me-1"></i> Premiere Cinema Experience
+        </span>
+        <h1 class="hero-title mb-3">Experience Cinema Like Never Before</h1>
+        <p class="hero-subtitle mb-4">
+            Browse today's top blockbusters, reserve your favorite seats in our 5x8 auditorium matrix, and share your thoughts with fellow moviegoers.
+        </p>
+
+        <!-- Search Bar -->
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
+                <form action="{% url 'movies:movie_list' %}" method="GET" class="d-flex gap-2 p-2 rounded-4" style="background: rgba(18, 23, 36, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 text-secondary">
+                            <i class="bi bi-search fs-5"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control bg-transparent border-0 text-white shadow-none" placeholder="Search by title, description or keyword..." value="{{ search_query|default:'' }}">
+                    </div>
+                    {% if selected_genre %}
+                        <input type="hidden" name="genre" value="{{ selected_genre }}">
+                    {% endif %}
+                    <button class="btn btn-cinema px-4" type="submit">
+                        Search
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filter & Movies Showcase -->
+<div class="container py-5">
+    <!-- Genre Filter Pills -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="h4 fw-bold mb-1 text-white">
+                <i class="bi bi-film text-danger me-2"></i>Now Playing in Theaters
+            </h2>
+            <p class="text-muted small mb-0">Showing {{ total_movies }} movie{{ total_movies|pluralize }}</p>
+        </div>
+
+        <!-- Genre Pill Nav -->
+        <div class="genre-pills-wrap">
+            <a href="{% url 'movies:movie_list' %}{% if search_query %}?q={{ search_query }}{% endif %}" class="genre-pill {% if not selected_genre %}active{% endif %}">
+                All Genres
+            </a>
+            {% for g in genres %}
+                <a href="{% url 'movies:movie_list' %}?genre={{ g }}{% if search_query %}&q={{ search_query }}{% endif %}" class="genre-pill {% if selected_genre == g %}active{% endif %}">
+                    {{ g }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Active Search Filter Badge -->
+    {% if search_query or selected_genre %}
+        <div class="d-flex align-items-center gap-2 mb-4 p-2 px-3 rounded-3" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);">
+            <span class="text-secondary small">Filters active:</span>
+            {% if selected_genre %}
+                <span class="badge bg-secondary">Genre: {{ selected_genre }}</span>
+            {% endif %}
+            {% if search_query %}
+                <span class="badge bg-secondary">Query: "{{ search_query }}"</span>
+            {% endif %}
+            <a href="{% url 'movies:movie_list' %}" class="btn btn-link btn-sm text-danger text-decoration-none ms-auto p-0 small">
+                <i class="bi bi-x-circle me-1"></i>Clear all filters
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Movies Grid -->
+    {% if movies %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for movie in movies %}
+                <div class="col">
+                    <div class="movie-card">
+                        <!-- Poster Box with Badges -->
+                        <div class="movie-poster-box">
+                            <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80';">
+                            <span class="badge-genre">{{ movie.genre }}</span>
+                            <span class="badge-rating">
+                                <i class="bi bi-star-fill text-warning"></i>
+                                {% if movie.average_rating > 0 %}
+                                    {{ movie.average_rating }}
+                                {% else %}
+                                    New
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="movie-card-body">
+                            <h3 class="movie-card-title" title="{{ movie.title }}">{{ movie.title }}</h3>
+                            
+                            <div class="movie-meta-row">
+                                <span><i class="bi bi-clock me-1"></i>{{ movie.duration_formatted }}</span>
+                                <span>•</span>
+                                <span><i class="bi bi-calendar3 me-1"></i>{{ movie.release_date|date:"Y" }}</span>
+                                <span>•</span>
+                                <span class="text-warning">
+                                    <i class="bi bi-chat-left-quote me-1"></i>{{ movie.total_reviews }} review{{ movie.total_reviews|pluralize }}
+                                </span>
+                            </div>
+
+                            <p class="movie-card-desc">
+                                {{ movie.description }}
+                            </p>
+
+                            <!-- CTA Buttons -->
+                            <div class="mt-auto d-grid gap-2">
+                                <a href="{% url 'movies:movie_detail' movie.id %}" class="btn btn-cinema">
+                                    <i class="bi bi-ticket-detailed me-1"></i> View Showtimes & Reviews
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-5 my-5">
+            <div class="display-1 text-muted mb-3">
+                <i class="bi bi-film"></i>
+            </div>
+            <h3 class="fw-bold text-white mb-2">No Movies Found</h3>
+            <p class="text-muted mb-4">
+                We couldn't find any movie matching your selected filters. Try searching with different keywords.
+            </p>
+            <a href="{% url 'movies:movie_list' %}" class="btn btn-outline-danger">
+                <i class="bi bi-arrow-left me-1"></i> View All Movies
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

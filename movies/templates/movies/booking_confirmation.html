@@ -1,0 +1,98 @@
+{% extends 'movies/base.html' %}
+{% load static %}
+
+{% block title %}Booking Confirmation — {{ booking.booking_reference }} | CineVerse{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-4">
+        <div class="display-5 text-success mb-2">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <h1 class="h2 fw-bold text-white">Tickets Confirmed!</h1>
+        <p class="text-secondary">Your seats have been successfully reserved. Present this digital ticket at the cinema box office.</p>
+    </div>
+
+    <!-- Cinema Ticket Voucher Card -->
+    <div class="ticket-voucher">
+        <div class="ticket-notch-left"></div>
+        <div class="ticket-notch-right"></div>
+
+        <!-- Ticket Header Banner -->
+        <div class="ticket-header-strip d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-film fs-4"></i>
+                <span class="fw-bold fs-5">CineVerse E-Ticket</span>
+            </div>
+            <span class="badge bg-light text-dark fw-bold px-3 py-2 rounded-pill">
+                REF: {{ booking.booking_reference }}
+            </span>
+        </div>
+
+        <!-- Ticket Details Body -->
+        <div class="ticket-body">
+            <div class="row g-4 align-items-center">
+                <!-- Movie Thumbnail -->
+                <div class="col-md-3 text-center">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="rounded-3 shadow" style="width: 100px; height: 145px; object-fit: cover;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80';">
+                </div>
+
+                <!-- Info Grid -->
+                <div class="col-md-9">
+                    <h3 class="h4 fw-bold text-white mb-2">{{ movie.title }}</h3>
+                    <div class="badge bg-secondary mb-3">{{ movie.genre }} • {{ movie.duration_formatted }}</div>
+
+                    <div class="row g-2 text-secondary small">
+                        <div class="col-6">
+                            <span class="d-block text-muted">Date & Time:</span>
+                            <span class="text-white fw-semibold">{{ showtime.show_date|date:"M d, Y" }} @ {{ showtime.show_time|time:"g:i A" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="d-block text-muted">Auditorium / Screen:</span>
+                            <span class="text-white fw-semibold">{{ showtime.screen_number }}</span>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <span class="d-block text-muted">Reserved Seats:</span>
+                            <span class="text-success fw-bold fs-6">{{ booking.selected_seats }}</span>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <span class="d-block text-muted">Total Amount Paid:</span>
+                            <span class="text-warning fw-bold fs-6">${{ booking.total_paid }} ({{ booking.seat_count }} ticket{{ booking.seat_count|pluralize }})</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-secondary my-3">
+
+            <!-- Customer & Barcode footer -->
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 text-muted small">
+                <div>
+                    <div><strong>Customer:</strong> {{ booking.customer_name }}</div>
+                    <div><strong>Email:</strong> {{ booking.customer_email }}</div>
+                    {% if booking.customer_phone %}
+                        <div><strong>Phone:</strong> {{ booking.customer_phone }}</div>
+                    {% endif %}
+                </div>
+                <div class="text-end">
+                    <div class="barcode-strip fs-4 text-white">||| | |||| | ||||| ||| |</div>
+                    <div class="small text-muted">{{ booking.booking_reference }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="text-center mt-4 d-flex justify-content-center gap-3">
+        <button onclick="window.print()" class="btn btn-outline-light">
+            <i class="bi bi-printer me-1"></i> Print Ticket Voucher
+        </button>
+        <a href="{% url 'movies:my_bookings' %}?q={{ booking.booking_reference }}" class="btn btn-outline-danger">
+            <i class="bi bi-ticket-perforated me-1"></i> View in My Bookings
+        </a>
+        <a href="{% url 'movies:movie_list' %}" class="btn btn-cinema">
+            <i class="bi bi-house me-1"></i> Back to Movies
+        </a>
+    </div>
+</div>
+{% endblock %}
