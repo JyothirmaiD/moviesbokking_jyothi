@@ -4,9 +4,16 @@ Populates CineVerse with realistic movies, showtimes, occupied seats, and commun
 Run via: python seed_data.py
 """
 import os
+import sys
 import django
 from datetime import date, time, timedelta
 from decimal import Decimal
+
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cinema_portal.settings')
 django.setup()
@@ -111,7 +118,6 @@ def seed_database():
                         selected_seats="A3, A4",
                         seat_count=2,
                         total_paid=Decimal("2") * price,
-                        booking_reference="TKT-SAMPLE01"
                     )
                     booking2 = SeatBooking.objects.create(
                         showtime=showtime,
@@ -121,9 +127,8 @@ def seed_database():
                         selected_seats="C1, C2, C3",
                         seat_count=3,
                         total_paid=Decimal("3") * price,
-                        booking_reference="TKT-SAMPLE02"
                     )
-                    print(f"    * Created demo bookings for {showtime}")
+                    print(f"    * Created demo bookings ({booking1.booking_reference}, {booking2.booking_reference}) for {showtime}")
 
         # 4. Community Reviews
         if not movie.reviews.exists():

@@ -102,7 +102,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-]
+] if (BASE_DIR / "static").exists() else []
 
 # WhiteNoise storage configuration for compressed static assets
 STORAGES = {

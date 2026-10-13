@@ -131,8 +131,10 @@ class SeatBooking(models.Model):
     def save(self, *args, **kwargs):
         # Auto-generate unique booking reference if not provided
         if not self.booking_reference:
-            short_id = uuid.uuid4().hex[:8].upper()
-            self.booking_reference = f"TKT-{short_id}"
+            ref = f"TKT-{uuid.uuid4().hex[:8].upper()}"
+            while SeatBooking.objects.filter(booking_reference=ref).exists():
+                ref = f"TKT-{uuid.uuid4().hex[:8].upper()}"
+            self.booking_reference = ref
         super().save(*args, **kwargs)
 
 
